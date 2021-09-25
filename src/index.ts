@@ -1,5 +1,6 @@
-// CloudFlare API token
-// for zone: example.com (Edit)
+import ClientError from './error';
+import Flare from './flare';
+
 const CLOUDFLARE_API_TOKEN = 'TO_BE_FILLED';
 // Currently, there seems not to be a way to get zone ids with tokens. So hardcode it here.
 // https://community.cloudflare.com/t/bug-in-list-zones-endpoint-when-using-api-token/115048
@@ -20,50 +21,7 @@ const TOKENS = /* TOKENS: */ {
 // Time To Live in DNS record. 1 indictes automatic.
 const TTL = 1;
 
-class Flare {
-  constructor(api_token) {
-    this.api_token = api_token;
-  }
-
-  async request(method: 'GET' | 'POST' | 'PUT' | 'DELETE', path: string, data: any) {
-    const response = await fetch(`https://api.cloudflare.com/client/v4/${path}`, {
-      method,
-      headers: {
-        Authorization: `Bearer ${this.api_token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-    if (!response.ok) {
-      throw new Error(`Upstream response error (status code: ${response.status})`);
-    }
-    try {
-      return await response.json();
-    } catch (e) {
-      throw new Error('Upstream invalid response');
-    }
-  }
-
-  get(path, data) {
-    return this.request('GET', path, data);
-  }
-
-  post(path, data) {
-    return this.request('POST', path, data);
-  }
-
-  put(path, data) {
-    return this.request('PUT', path, data);
-  }
-
-  delete(path, data) {
-    return this.request('delete', path, data);
-  }
-}
-
 const flare = new Flare(CLOUDFLARE_API_TOKEN);
-
-class ClientError extends Error { }
 
 addEventListener('fetch', (event) => {
   event.respondWith(handleRequest(event.request));
