@@ -77,7 +77,7 @@ async function handleRequest(request: Request) {
         return await handleAction(action, token, domain, rType, content);
       }
 
-      return new Response(`Unsupported action: ${action}`, { status: 404 });
+      throw new ClientError(`Unsupported action: ${action}`);
     } catch (e) {
       if (e instanceof ClientError) {
         return new Response(e as any, { status: 400 });
