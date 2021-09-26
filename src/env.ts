@@ -7,17 +7,15 @@ export const DEBUG_MODE = ENV_DEBUG_MODE === 'false' || !!ENV_DEBUG_MODE;
 // Trailing dots CANNOT BE OMITTED.
 // UPDATE: seems api works
 export const ZONES: Record<string, { id: string }> = {
-  'example.org.': {
-    id: 'TO_BE_FILLED',
-  },
+  'example.org.': { id: 'TO_BE_FILLED' },
 };
 // Arbitrary API tokens, mapping domains to customizable tokens, which can be any text.
 // Tokens for a domain can always be used to access its direct or indirect subdomains.
 // Trailing dots CANNOT BE OMITTED.
 export const TOKENS: Record<string, string> = /* TOKENS: */ {
-  'example.org.': 'b69541a8-0acd-4e14-aecf-053d5e1b923d',
-  'foo.example.org.': '144e7c59-7c2b-4360-9d16-00bbad549fb9',
-  'foo.bar.example.org.': '218fa52e-d3c9-419d-a800-d8510e899a30',
+  'example.org.': 'RANDOM',
+  'foo.example.org.': 'TOKEN',
+  'foo.bar.example.org.': 'HERE',
 };
 // Time To Live in DNS record. 1 indictes automatic.
 export const TTL = 1;
