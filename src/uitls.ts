@@ -33,7 +33,12 @@ export function canonicalizeDomain(domain: string) {
   return domain;
 }
 
-// Search predefined ZONES for matching domain, returning the matched zone.
+/**
+ * Search predefined ZONES for matching domain, returning the matched zone.
+ * @deprecated we can get zoneId from api now
+ * @param domain domain
+ * @returns matched zone
+ */
 export function getZoneByDomain(domain: string): Record<'id', string> | undefined {
   for (const parentDomain of parentDomains(domain)) {
     if (ZONES[parentDomain] !== undefined) {
