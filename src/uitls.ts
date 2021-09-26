@@ -52,3 +52,14 @@ export function getEffectiveDomain(token: string, domain: string): string | unde
   }
   return undefined;
 }
+
+export async function getParsedError(failedResponse: Response): Promise<string> {
+  const clone = failedResponse.clone();
+  const clone2 = failedResponse.clone();
+  try {
+    const json = await clone.json();
+    return JSON.stringify(json, null, 2);
+  } catch {
+    return clone2.text();
+  }
+}

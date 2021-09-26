@@ -1,5 +1,5 @@
 import { CLOUDFLARE_API_TOKEN } from './env';
-import ClientError from './error';
+import { ClientError } from './error';
 import Flare from './flare';
 import {
   canonicalizeDomain, getEffectiveDomain, simplifyDomain,

@@ -1,5 +1,6 @@
+import { CFError } from './error';
 import { DeletedDNSRecord, DNSRecord, Zone } from './flareResponse';
-import { simplifyDomain } from './uitls';
+import { getParsedError, simplifyDomain } from './uitls';
 
 export default class Flare {
   constructor(
@@ -15,13 +16,12 @@ export default class Flare {
       },
       body: data,
     });
-    if (!response.ok) {
-      throw new Error(`Upstream response error (status code: ${response.status})`);
-    }
+    const clone = response.clone();
     try {
+      if (!response.ok) throw new Error('not ok');
       return (await response.json()).result;
-    } catch (e) {
-      throw new Error('Upstream invalid response');
+    } catch {
+      throw new CFError(await getParsedError(clone), `Upstream invalid response (status code: ${response.status})`);
     }
   }
 
