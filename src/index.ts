@@ -21,8 +21,8 @@ async function handleAction(
     throw new ClientError('Invalid token');
   }
   const zones = await flare.listZones(effectiveDomain);
-  if (zones.length !== 1) throw new Error('Zone not unique or not found');
-  if (zones[0].name !== domain && zones[0].name !== simplifyDomain(domain)) throw new Error('Zone not found');
+  if (zones.length !== 1) throw new ClientError('Zone not unique or not found');
+  if (zones[0].name !== domain && zones[0].name !== simplifyDomain(domain)) throw new ClientError('Zone not found');
   const zoneId = zones[0].id;
   const records = await flare.listRecords(zoneId, domain, rType);
   if (parsedAction === 'upsert' && records.length === 0) {
