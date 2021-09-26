@@ -64,26 +64,29 @@ async function handleAction(
  */
 async function handleRequest(request: Request) {
   const url = new URL(request.url);
-  if (url.pathname === '/') {
+  if (url.pathname === '/' && request.method === 'GET') {
     return new Response('cfapi-ddns-worker is up');
-  }
-  try {
-    const path = url.pathname.startsWith('/') ? url.pathname.substring(1) : url.pathname;
-    const [action, token, domain, rType, content] = path.split('/', 5);
-    if (['update', 'create', 'delete', 'upsert'].includes(action)) {
-      if ([token, domain, rType, content].some((e) => e === undefined)) {
-        throw new ClientError('Parameters Missing');
+  } if (request.method === 'POST') {
+    try {
+      const path = url.pathname.startsWith('/') ? url.pathname.substring(1) : url.pathname;
+      const [action, token, domain, rType, content] = path.split('/', 5);
+      if (['update', 'create', 'delete', 'upsert'].includes(action)) {
+        if ([token, domain, rType, content].some((e) => e === undefined)) {
+          throw new ClientError('Parameters Missing');
+        }
+        return await handleAction(action, token, domain, rType, content);
       }
-      return await handleAction(action, token, domain, rType, content);
-    }
 
-    return new Response(`Unsupported action: ${action}`, { status: 404 });
-  } catch (e) {
-    if (e instanceof ClientError) {
-      return new Response(e as any, { status: 400 });
-    }
+      return new Response(`Unsupported action: ${action}`, { status: 404 });
+    } catch (e) {
+      if (e instanceof ClientError) {
+        return new Response(e as any, { status: 400 });
+      }
 
-    return new Response(e as any, { status: 500 });
+      return new Response(e as any, { status: 500 });
+    }
+  } else {
+    return new Response('', { status: 405 });
   }
 }
 
