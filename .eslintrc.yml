@@ -26,3 +26,4 @@ rules:
   no-undef: 'off'
   no-restricted-globals: 'off'
   no-restricted-syntax: 'off'
+  no-redeclare: 'off'
