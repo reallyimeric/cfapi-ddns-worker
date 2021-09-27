@@ -1,6 +1,7 @@
 export const CLOUDFLARE_API_TOKEN = ENV_CLOUDFLARE_API_TOKEN;
 
 export const DEBUG_MODE = ENV_DEBUG_MODE === 'false' || !!ENV_DEBUG_MODE;
+export const USE_KV = ENV_USE_KV === 'false' || !!ENV_USE_KV;
 
 // Currently, there seems not to be a way to get zone ids with tokens. So hardcode it here.
 // https://community.cloudflare.com/t/bug-in-list-zones-endpoint-when-using-api-token/115048

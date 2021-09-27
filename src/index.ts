@@ -16,7 +16,7 @@ async function handleAction(
 ) {
   let parsedAction = action;
   const canonDomain = canonicalizeDomain(domain);
-  const effectiveDomain = getEffectiveDomain(token, canonDomain);
+  const effectiveDomain = await getEffectiveDomain(token, canonDomain);
   if (effectiveDomain === undefined) {
     throw new ClientError('Invalid token');
   }
