@@ -47,6 +47,13 @@ export default class Flare {
     return this.request<Zone[]>('GET', `/zones?name=${encodeURIComponent(name)}`);
   }
 
+  /**
+   * List the first page of dns records in specified zone
+   * @param zoneId zone id
+   * @param domain name to search
+   * @param rType record type
+   * @returns the first page of list of matching DNS record
+   */
   public async listRecords(zoneId: string, domain: string, rType: string) {
     return this.request<DNSRecord[]>(
       'GET',
