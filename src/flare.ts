@@ -1,5 +1,7 @@
 import { CFError } from './error';
-import { DeletedDNSRecord, DNSRecord, Zone } from './flareResponse';
+import {
+  CloudFlareResponse, DeletedDNSRecord, DNSRecord, Zone,
+} from './flareResponse';
 import { getParsedError, simplifyDomain } from './uitls';
 
 export default class Flare {
@@ -7,7 +9,15 @@ export default class Flare {
     private apiToken: string,
   ) { }
 
-  private async request(method: string, path: string, data?: any): Promise<unknown> {
+  private async request<T>(
+    method: string, path: string, data?: any, raw?: false
+  ): Promise<T>
+
+  private async request<T>(
+    method: string, path: string, data?: any, raw?: true
+  ): Promise<CloudFlareResponse<T>>
+
+  private async request<T>(method: string, path: string, data?: any, raw = false) {
     const response = await fetch(`https://api.cloudflare.com/client/v4${path}`, {
       method,
       headers: {
@@ -19,44 +29,52 @@ export default class Flare {
     const clone = response.clone();
     try {
       if (!response.ok) throw new Error('not ok');
-      return (await response.json()).result;
+      const parsedResponse = await response.json() as CloudFlareResponse<T>;
+      return raw ? parsedResponse : parsedResponse.result;
     } catch {
       throw new CFError(await getParsedError(clone), `Upstream invalid response (status code: ${response.status})`);
     }
   }
 
-  public async listZones(name: string): Promise<Zone[]> {
-    return this.request('GET', `/zones?name=${encodeURIComponent(name)}`) as Promise<Zone[]>;
+  public async listZones(): Promise<CloudFlareResponse<Zone[]>>
+
+  public async listZones(name: ''): Promise<CloudFlareResponse<Zone[]>>
+
+  public async listZones(name: string): Promise<Zone[]>
+
+  public async listZones(name?: string) {
+    if (!name) return this.request<Zone[]>('GET', '/zones', undefined, true);
+    return this.request<Zone[]>('GET', `/zones?name=${encodeURIComponent(name)}`);
   }
 
-  public async listRecords(zoneId: string, domain: string, rType: string): Promise<DNSRecord[]> {
-    return this.request(
+  public async listRecords(zoneId: string, domain: string, rType: string) {
+    return this.request<DNSRecord[]>(
       'GET',
       `/zones/${encodeURIComponent(zoneId)}/dns_records?name=${encodeURIComponent(simplifyDomain(domain))}&type=${encodeURIComponent(rType)}`,
-    ) as Promise<DNSRecord[]>;
+    );
   }
 
   public async createRecord(
     zoneId: string, rType: string, domain: string, content: string,
-  ): Promise<DNSRecord> {
-    return this.request(
+  ) {
+    return this.request<DNSRecord>(
       'POST',
       `/zones/${encodeURIComponent(zoneId)}/dns_records`,
       { type: rType, name: simplifyDomain(domain), content },
-    ) as Promise<DNSRecord>;
+    );
   }
 
   public async updateRecord(
     zoneId: string, recordId: string, rType: string, domain: string, content: string,
-  ): Promise<DNSRecord> {
-    return this.request(
+  ) {
+    return this.request<DNSRecord>(
       'PUT',
       `/zones/${encodeURIComponent(zoneId)}/dns_records/${encodeURIComponent(recordId)}`,
       { type: rType, name: simplifyDomain(domain), content },
-    ) as Promise<DNSRecord>;
+    );
   }
 
-  public async deleteRecord(zoneId: string, recordId: string): Promise<DeletedDNSRecord> {
-    return this.request('DELETE', `/zones/${encodeURIComponent(zoneId)}/dns_records/${encodeURIComponent(recordId)}`) as Promise<DeletedDNSRecord>;
+  public async deleteRecord(zoneId: string, recordId: string) {
+    return this.request<DeletedDNSRecord>('DELETE', `/zones/${encodeURIComponent(zoneId)}/dns_records/${encodeURIComponent(recordId)}`);
   }
 }

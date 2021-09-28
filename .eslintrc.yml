@@ -27,3 +27,4 @@ rules:
   no-restricted-globals: 'off'
   no-restricted-syntax: 'off'
   no-redeclare: 'off'
+  no-dupe-class-members: 'off'

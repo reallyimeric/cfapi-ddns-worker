@@ -16,3 +16,16 @@ export interface DNSRecord {
 export interface DeletedDNSRecord {
   id: string,
 }
+
+export interface CloudFlareResponse<T> {
+  result: T,
+  /* eslint-disable-next-line camelcase */
+  result_info: {
+    page: number,
+    /* eslint-disable-next-line camelcase */
+    per_page: number,
+    count: number,
+    /* eslint-disable-next-line camelcase */
+    total_count: number,
+  }
+}
