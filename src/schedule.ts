@@ -21,7 +21,7 @@ const ZONE_NAME_DIVIDER = '/';
 
 async function writeZones(zones: Zone[]): Promise<any> {
   return Promise.all([
-    ...zones.map((zone) => CFAPI_DDNS_WORKER_STORE.put(`${ZONE_PREFIX}${zone.id}`, zone.name)),
+    ...zones.map((zone) => CFAPI_DDNS_WORKER_STORE.put(`${ZONE_PREFIX}${zone.id}`, JSON.stringify(zone))),
     CFAPI_DDNS_WORKER_STORE.put('zoneNameList', zones.map((zone) => zone.name).join(ZONE_NAME_DIVIDER)),
     CFAPI_DDNS_WORKER_STORE.put('zoneIdList', zones.map((zone) => zone.id).join(ZONE_ID_DIVIDER)),
   ]);
