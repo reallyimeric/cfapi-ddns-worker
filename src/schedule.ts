@@ -10,7 +10,7 @@ async function fetchAllZones(flare: Flare): Promise<Zone[]> {
     /* eslint-disable-next-line no-await-in-loop */
     const { result, result_info: resultInfo } = await flare.listZones({ page: currentPage });
     list = list.concat(result);
-    totalPage = resultInfo.count;
+    totalPage = resultInfo.total_pages;
   }
   return list;
 }

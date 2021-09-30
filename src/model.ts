@@ -27,6 +27,9 @@ export interface CloudFlareResponse<T> {
     count: number,
     /* eslint-disable-next-line camelcase */
     total_count: number,
+    /* eslint-disable-next-line camelcase */
+    total_pages: number,
+
   }
 }
 
