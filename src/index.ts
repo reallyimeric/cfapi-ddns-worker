@@ -1,6 +1,7 @@
 import { CLOUDFLARE_API_TOKEN } from './env';
 import { ClientError } from './error';
 import Flare from './flare';
+import registerSchedule from './schedule';
 import {
   canonicalizeDomain, getEffectiveDomain, simplifyDomain,
 } from './uitls';
@@ -20,7 +21,7 @@ async function handleAction(
   if (effectiveDomain === undefined) {
     throw new ClientError('Invalid token');
   }
-  const zones = await flare.listZones(effectiveDomain);
+  const zones = (await flare.listZones({ name: effectiveDomain })).result;
   if (zones.length !== 1) throw new ClientError('Zone not unique or not found');
   if (zones[0].name !== domain && zones[0].name !== simplifyDomain(domain)) throw new ClientError('Zone not found');
   const zoneId = zones[0].id;
@@ -93,3 +94,4 @@ async function handleRequest(request: Request) {
 addEventListener('fetch', (event) => {
   event.respondWith(handleRequest(event.request));
 });
+registerSchedule(flare);

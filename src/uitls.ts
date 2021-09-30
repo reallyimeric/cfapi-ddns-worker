@@ -1,6 +1,6 @@
 // Generator function yielding a canonicalized domain and all of its parent-domains.
 
-import { TOKENS, ZONES } from './env';
+import { TOKENS, USE_KV, ZONES } from './env';
 
 // e.g. parentDomains("www.example.org.") -> ["www.example.org.", "example.org"., "org.", "."]*
 export function* parentDomains(domain: string) {
@@ -49,7 +49,11 @@ export function getZoneByDomain(domain: string): Record<'id', string> | undefine
 }
 
 // Search TOKENS for matching token, serving as authentication process.
-export function getEffectiveDomain(token: string, domain: string): string | undefined {
+// Key: example.com, value: RANDOM_TOKEN
+async function getEffectiveDomainFromCode(
+  token: string, domain: string,
+): Promise<string | undefined> {
+  if (!token) return undefined;
   for (const parentDomain of parentDomains(domain)) {
     if (TOKENS[parentDomain] && TOKENS[parentDomain] === token) {
       return parentDomain;
@@ -57,6 +61,20 @@ export function getEffectiveDomain(token: string, domain: string): string | unde
   }
   return undefined;
 }
+
+// Key: RANDOM_TOKEN, value: example.com
+async function getEffectiveDomainFromKV(
+  token: string, domain: string,
+): Promise<string | undefined> {
+  if (!token) return undefined;
+  const tokenDomain = canonicalizeDomain(await CFAPI_DDNS_WORKER_STORE.get(token));
+  for (const parentDomain of parentDomains(domain)) {
+    if (parentDomain === tokenDomain) return tokenDomain;
+  }
+  return undefined;
+}
+
+export const getEffectiveDomain = USE_KV ? getEffectiveDomainFromKV : getEffectiveDomainFromCode;
 
 export async function getParsedError(failedResponse: Response): Promise<string> {
   const clone = failedResponse.clone();

@@ -1,7 +1,7 @@
 import { CFError } from './error';
 import {
-  CloudFlareResponse, DeletedDNSRecord, DNSRecord, Zone,
-} from './flareResponse';
+  CloudFlareResponse, DeletedDNSRecord, DNSRecord, ListZonesParameter, Zone,
+} from './model';
 import { getParsedError, simplifyDomain } from './uitls';
 
 export default class Flare {
@@ -36,15 +36,22 @@ export default class Flare {
     }
   }
 
-  public async listZones(): Promise<CloudFlareResponse<Zone[]>>
+  private static serializeParameters(params: any): FormData | URLSearchParams {
+    const heresAFile = Object.values(params).some((v) => v instanceof File);
+    const record = heresAFile ? new FormData() : new URLSearchParams();
+    Object.entries(params).forEach(([k, v]) => {
+      if (v instanceof File) {
+        record.append(k, v);
+      } else {
+        record.append(k, `${v}`);
+      }
+    });
+    return record;
+  }
 
-  public async listZones(name: ''): Promise<CloudFlareResponse<Zone[]>>
-
-  public async listZones(name: string): Promise<Zone[]>
-
-  public async listZones(name?: string) {
-    if (!name) return this.request<Zone[]>('GET', '/zones', undefined, true);
-    return this.request<Zone[]>('GET', `/zones?name=${encodeURIComponent(name)}`);
+  public async listZones(options: ListZonesParameter = {}) {
+    const params = Flare.serializeParameters(options) as URLSearchParams;
+    return this.request<Zone[]>('GET', `/zones?${params}`, undefined, true);
   }
 
   /**

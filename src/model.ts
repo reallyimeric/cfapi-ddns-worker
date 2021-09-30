@@ -29,3 +29,12 @@ export interface CloudFlareResponse<T> {
     total_count: number,
   }
 }
+
+interface RequestParameter {
+  page?: number;
+  size?: number;
+}
+
+export interface ListZonesParameter extends RequestParameter {
+  name?: string;
+}

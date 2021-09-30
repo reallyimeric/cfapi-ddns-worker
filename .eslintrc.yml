@@ -28,3 +28,7 @@ rules:
   no-restricted-syntax: 'off'
   no-redeclare: 'off'
   no-dupe-class-members: 'off'
+  camelcase:
+    - error
+    - ignoreDestructuring: true
+  no-plusplus: 'off'
